@@ -3,9 +3,12 @@
 Logger module for filtering sensitive personal information.
 """
 
+import os
 import logging
 from typing import List
 import re
+import mysql.connector
+from mysql.connector.connection import MySQLConnection
 
 
 PII_FIELDS = ("name", "email", "phone", "ssn", "password")
@@ -75,3 +78,18 @@ def get_logger() -> logging.Logger:
         logger.addHandler(stream_handler)
 
     return logger
+
+
+def get_db() -> MySQLConnection:
+    """
+    Connect to MySQL database using credentials from environment variables.
+
+    Returns:
+        MySQLConnection: MySQL connection object.
+    """
+    return mysql.connector.connect(
+        user=os.environ.get("PERSONAL_DATA_DB_USERNAME", "root"),
+        password=os.environ.get("PERSONAL_DATA_DB_PASSWORD", ""),
+        host=os.environ.get("PERSONAL_DATA_DB_HOST", "localhost"),
+        database=os.environ["PERSONAL_DATA_DB_NAME"]
+    )
